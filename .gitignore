@@ -1,0 +1,33 @@
+# IDE and Editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Environment and secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Build and Dependency directories (generic)
+node_modules/
+dist/
+build/
+bin/
+obj/
+out/
+target/
+__pycache__/
+*.pyc
+
+# Docker volumes and logs
+*.log
+docker-data/
