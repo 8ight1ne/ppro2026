@@ -31,3 +31,6 @@ __pycache__/
 # Docker volumes and logs
 *.log
 docker-data/
+*.db
+*.db-shm
+*.db-wal

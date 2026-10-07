@@ -1,0 +1,183 @@
+@page
+@model ReportyModel
+@{
+    ViewData["Title"] = "Přehledy & Reporty";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1">Manažerské přehledy a statistiky</h2>
+        <p class="text-muted mb-0">Požadavek klienta č. 8: Vytíženost kapacit, odučené hodiny lektorů a vícekurzoví studenti</p>
+    </div>
+</div>
+
+<!-- Report 1: Vytíženost a naplněnost termínů -->
+<div class="content-card mb-4">
+    <div class="content-card-header">
+        <h5 class="content-card-title">1️⃣ Vytíženost a naplněnost termínů</h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-custom">
+            <thead>
+                <tr>
+                    <th>Kurz</th>
+                    <th>Učebna</th>
+                    <th>Termín</th>
+                    <th>Kapacita</th>
+                    <th>Obsazeno</th>
+                    <th>Pořadník</th>
+                    <th>Míra zaplnění</th>
+                    <th>Stav</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var u in Model.Vytizenost)
+                {
+                    int obsazeno = u.PocetPrihlasenych + u.PocetVNabidce;
+                    string barColor = u.ProcentoZaplneni >= 100 ? "red" : (u.ProcentoZaplneni >= 80 ? "amber" : "green");
+
+                    <tr>
+                        <td><strong>@u.KurzNazev</strong></td>
+                        <td>@u.UcebnaNazev</td>
+                        <td>@u.DatumOd.ToString("dd.MM.yyyy") – @u.DatumDo.ToString("dd.MM.yyyy")</td>
+                        <td>@u.Kapacita míst</td>
+                        <td>
+                            <strong>@obsazeno</strong>
+                            @if (u.PocetVNabidce > 0)
+                            {
+                                <small class="text-warning">(@u.PocetVNabidce v nabídce)</small>
+                            }
+                        </td>
+                        <td>
+                            @if (u.PocetVPoradniku > 0)
+                            {
+                                <span class="badge badge-poradnik">@u.PocetVPoradniku náhradníků</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted small">0</span>
+                            }
+                        </td>
+                        <td>
+                            <span class="fw-bold">@u.ProcentoZaplneni %</span>
+                            <div class="capacity-progress" style="width: 140px;">
+                                <div class="capacity-progress-bar @barColor" style="width: @Math.Min(100, u.ProcentoZaplneni)%"></div>
+                            </div>
+                        </td>
+                        <td><span class="badge bg-light text-dark border">@u.Stav</span></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Report 2: Reálně odučené hodiny lektorů -->
+    <div class="col-lg-6 mb-4">
+        <div class="content-card h-100">
+            <div class="content-card-header">
+                <h5 class="content-card-title">2️⃣ Odučené hodiny lektorů</h5>
+            </div>
+            <p class="text-muted small">
+                Mzdové podklady a vykazování: reálně vyučované hodiny z přiřazených termínů (Rozhodnutí č. 5).
+            </p>
+            <div class="table-responsive">
+                <table class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th>Lektor</th>
+                            <th>Typ úvazku</th>
+                            <th>Termínů</th>
+                            <th>Odučeno hodin</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var l in Model.HodinyLektoru)
+                        {
+                            <tr>
+                                <td>
+                                    <strong>@l.JmenoPrijmeni</strong><br />
+                                    <small class="text-muted">@l.Email</small>
+                                </td>
+                                <td>
+                                    @if (l.Externista)
+                                    {
+                                        <span class="badge bg-secondary">Externista</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-primary">Interní zaměstnanec</span>
+                                    }
+                                </td>
+                                <td>@l.PocetTerminu</td>
+                                <td>
+                                    <strong class="fs-6 text-primary">@l.CelkemOducenychHodin hod.</strong>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report 3: Studenti na více kurzech v roce -->
+    <div class="col-lg-6 mb-4">
+        <div class="content-card h-100">
+            <div class="content-card-header">
+                <h5 class="content-card-title">3️⃣ Studenti na více kurzech</h5>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <p class="text-muted small mb-0">
+                    Studenti, kteří se v roce @Model.Rok přihlásili na 2 a více kurzů.
+                </p>
+                <form method="get" class="d-flex align-items-center gap-1">
+                    <label class="small text-muted me-1">Rok:</label>
+                    <input type="number" asp-for="Rok" class="form-control form-control-sm" style="width: 80px;" onchange="this.form.submit()" />
+                </form>
+            </div>
+
+            @if (Model.StudentiViceKurzu.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-custom">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Počet kurzů</th>
+                                <th>Absolvované / aktivní kurzy</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var s in Model.StudentiViceKurzu)
+                            {
+                                <tr>
+                                    <td>
+                                        <strong>@s.JmenoPrijmeni</strong><br />
+                                        <small class="text-muted">@s.Email</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-success fs-6">@s.PocetKurzuVRoce kurzy</span>
+                                    </td>
+                                    <td>
+                                        <ul class="list-unstyled mb-0 small">
+                                            @foreach (var k in s.SeznamKurzu)
+                                            {
+                                                <li>✔️ @k</li>
+                                            }
+                                        </ul>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted small mt-3">V zadaném roce nebyl nalezen žádný student s 2 a více kurzy.</p>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,318 @@
+@page
+@model PrihlaskyModel
+@{
+    ViewData["Title"] = "Přihlášky & Pořadník";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1">Správa přihlášek a pořadník náhradníků</h2>
+        <p class="text-muted mb-0">Evidence zájemců, striktní hlídání kapacit a automatický posun z pořadníku</p>
+    </div>
+    <button class="btn btn-primary-custom" data-bs-toggle="collapse" data-bs-target="#newRegCollapse">
+        ➕ Zapsat nového studenta
+    </button>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.AlertMessage))
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>✅ Úspěch:</strong> @Model.AlertMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(Model.AlertError))
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>⚠️ Chyba byznys pravidla:</strong> @Model.AlertError
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<!-- Formulář nového zápisu (Collapse) -->
+<div class="collapse mb-4" id="newRegCollapse">
+    <div class="content-card border-primary">
+        <h5 class="content-card-title mb-3">Zápis studenta do kurzu</h5>
+        <form method="post" asp-page-handler="Register">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-semibold">Termín kurzu</label>
+                    <select asp-for="NewRegistration.TerminId" class="form-select" required>
+                        <option value="">-- Vyberte termín --</option>
+                        @foreach (var t in Model.VsechnyTerminy)
+                        {
+                            int prihlaseni = t.Prihlasky.Count(p => p.Stav == Core.Enums.StavPrihlasky.Prihlasen || p.Stav == Core.Enums.StavPrihlasky.Nabidnuto || p.Stav == Core.Enums.StavPrihlasky.Dokonceno);
+                            int poradnik = t.Prihlasky.Count(p => p.Stav == Core.Enums.StavPrihlasky.Poradnik);
+                            <option value="@t.Id">
+                                @(t.Kurz?.Nazev ?? "Kurz") | @t.DatumOd.ToString("dd.MM.yyyy") – @t.DatumDo.ToString("dd.MM.yyyy") (@prihlaseni/@t.Kapacita míst@(poradnik > 0 ? $", {poradnik} v pořadníku" : ""))
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-semibold">Výběr existujícího studenta</label>
+                    <select asp-for="NewRegistration.StudentId" class="form-select" id="studentSelect">
+                        <option value="">-- Vyberte z existujících studentů --</option>
+                        @foreach (var s in Model.VsechniStudenti)
+                        {
+                            <option value="@s.Id">@s.CeleJmeno (@s.Email)</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <!-- Rychlé vytvoření nového studenta -->
+            <div class="border rounded p-3 mb-3 bg-light">
+                <div class="form-check mb-2">
+                    <input asp-for="NewRegistration.CreateNewStudent" class="form-check-input" type="checkbox" id="checkNewStudent" onchange="toggleNewStudentFields(this.checked)" />
+                    <label class="form-check-label fw-semibold" for="checkNewStudent">
+                        Nebo zaregistrovat úplně nového studenta
+                    </label>
+                </div>
+                <div id="newStudentFields" style="display: none;">
+                    <div class="row g-2">
+                        <div class="col-md-3">
+                            <input asp-for="NewRegistration.NoveJmeno" class="form-control" placeholder="Jméno" />
+                        </div>
+                        <div class="col-md-3">
+                            <input asp-for="NewRegistration.NovePrijmeni" class="form-control" placeholder="Příjmení" />
+                        </div>
+                        <div class="col-md-3">
+                            <input asp-for="NewRegistration.NovyEmail" type="email" class="form-control" placeholder="E-mail" />
+                        </div>
+                        <div class="col-md-3">
+                            <input asp-for="NewRegistration.NovyTelefon" class="form-control" placeholder="Telefon" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Výjimka administrátora po zahájení kurzu (Rozhodnutí č. 4) -->
+            <div class="border rounded p-3 mb-3" style="background: #fafafa;">
+                <div class="form-check mb-2">
+                    <input asp-for="NewRegistration.IsLateAdminEnrollment" class="form-check-input" type="checkbox" id="checkLateAdmin" onchange="toggleAdminNote(this.checked)" />
+                    <label class="form-check-label fw-semibold text-danger" for="checkLateAdmin">
+                        Výjimka administrátora: Dodatečný zápis po zahájení kurzu (Rozhodnutí č. 4)
+                    </label>
+                </div>
+                <div id="adminNoteField" style="display: none;">
+                    <label class="form-label small text-muted">Povinné textové odůvodnění administrátora (lze povolit pouze do 20 % dotace kurzu):</label>
+                    <textarea asp-for="NewRegistration.AdminNote" class="form-control" rows="2" placeholder="Např. Schváleno vedením centra po individuální domluvě se zaměstnavatelem..."></textarea>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#newRegCollapse">Zavřít</button>
+                <button type="submit" class="btn btn-primary-custom">Zapsat studenta</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Filtr dle termínu -->
+<div class="content-card mb-4">
+    <form method="get" class="row align-items-center g-3">
+        <div class="col-md-5">
+            <label class="form-label fw-semibold mb-1">Filtrovat podle termínu kurzu:</label>
+            <select asp-for="TerminFilterId" class="form-select" onchange="this.form.submit()">
+                <option value="">-- Všechny vypsané termíny --</option>
+                @foreach (var t in Model.VsechnyTerminy)
+                {
+                    <option value="@t.Id">
+                        @(t.Kurz?.Nazev ?? "Kurz") (@t.DatumOd.ToString("dd.MM.") – @t.DatumDo.ToString("dd.MM.yyyy"))
+                    </option>
+                }
+            </select>
+        </div>
+        <div class="col-md-7 text-md-end pt-md-4">
+            <span class="badge badge-prihlasen me-1">Přihlášen</span>
+            <span class="badge badge-nabidnuto me-1">Nabídnuto (24h)</span>
+            <span class="badge badge-poradnik me-1">Pořadník náhradníků</span>
+            <span class="badge badge-dokonceno me-1">Dokončeno</span>
+            <span class="badge badge-zruseno">Zrušeno (audit)</span>
+        </div>
+    </form>
+</div>
+
+<!-- Seznam přihlášek -->
+<div class="content-card">
+    <div class="content-card-header">
+        <h5 class="content-card-title">Evidované přihlášky (@Model.Prihlasky.Count záznamů)</h5>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-custom">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Termín & Kurz</th>
+                    <th>Datum přihlášení</th>
+                    <th>Stav přihlášky</th>
+                    <th>Pořadník / Nabídka</th>
+                    <th>Poznámka / Audit</th>
+                    <th>Akce</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var p in Model.Prihlasky)
+                {
+                    string badgeClass = p.Stav switch
+                    {
+                        Core.Enums.StavPrihlasky.Prihlasen => "badge-prihlasen",
+                        Core.Enums.StavPrihlasky.Poradnik => "badge-poradnik",
+                        Core.Enums.StavPrihlasky.Nabidnuto => "badge-nabidnuto",
+                        Core.Enums.StavPrihlasky.Dokonceno => "badge-dokonceno",
+                        Core.Enums.StavPrihlasky.Zruseno => "badge-zruseno",
+                        _ => "badge-expirovano"
+                    };
+
+                    <tr>
+                        <td>
+                            <strong>@(p.Student?.CeleJmeno ?? "Student")</strong><br />
+                            <small class="text-muted">✉️ @(p.Student?.Email ?? "")</small>
+                            @if (!string.IsNullOrEmpty(p.Student?.Organizace))
+                            {
+                                <br /><small class="text-secondary">🏢 @p.Student.Organizace</small>
+                            }
+                        </td>
+                        <td>
+                            <strong>@(p.Termin?.Kurz?.Nazev ?? "Kurz")</strong><br />
+                            <small class="text-muted">📅 @(p.Termin?.DatumOd.ToString("dd.MM.yyyy") ?? "") – @(p.Termin?.DatumDo.ToString("dd.MM.yyyy") ?? "")</small>
+                        </td>
+                        <td>
+                            <small>@p.DatumPrihlaseni.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</small>
+                        </td>
+                        <td>
+                            <span class="badge-status @badgeClass">
+                                @p.Stav
+                            </span>
+                        </td>
+                        <td>
+                            @if (p.Stav == Core.Enums.StavPrihlasky.Poradnik)
+                            {
+                                <span class="badge bg-warning text-dark fw-bold">
+                                    #@p.PoradiVPoradniku v pořadí
+                                </span>
+                            }
+                            else if (p.Stav == Core.Enums.StavPrihlasky.Nabidnuto)
+                            {
+                                var left = (p.NabidkaExpirace ?? DateTime.UtcNow) - DateTime.UtcNow;
+                                <span class="badge bg-danger text-white">
+                                    Vyprší za @Math.Max(0, (int)left.TotalHours) h @(left.Minutes) m
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </td>
+                        <td style="max-width: 250px;">
+                            @if (!string.IsNullOrEmpty(p.DuvodZruseni))
+                            {
+                                <small class="text-danger">
+                                    <strong>Důvod storna:</strong> @p.DuvodZruseni<br />
+                                    <em>(@(p.DatumZruseni?.ToLocalTime().ToString("dd.MM.yyyy HH:mm") ?? ""))</em>
+                                </small>
+                            }
+                            else if (!string.IsNullOrEmpty(p.PoznamkaAdmina))
+                            {
+                                <small class="text-muted">
+                                    <strong>Admin:</strong> @p.PoznamkaAdmina
+                                </small>
+                            }
+                            else
+                            {
+                                <small class="text-muted">-</small>
+                            }
+                        </td>
+                        <td>
+                            @if (p.Stav == Core.Enums.StavPrihlasky.Nabidnuto)
+                            {
+                                <div class="d-flex gap-1">
+                                    <form method="post" asp-page-handler="AcceptOffer" class="d-inline">
+                                        <input type="hidden" name="prihlaskaId" value="@p.Id" />
+                                        <button type="submit" class="btn btn-sm btn-success">Potvrdit</button>
+                                    </form>
+                                    <form method="post" asp-page-handler="DeclineOffer" class="d-inline">
+                                        <input type="hidden" name="prihlaskaId" value="@p.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Odmítnout</button>
+                                    </form>
+                                </div>
+                            }
+                            else if (p.Stav == Core.Enums.StavPrihlasky.Prihlasen || p.Stav == Core.Enums.StavPrihlasky.Poradnik)
+                            {
+                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="openCancelModal('@p.Id', '@(p.Student?.CeleJmeno ?? "Student")')">
+                                    Stornovat
+                                </button>
+                            }
+                            else if (p.Stav == Core.Enums.StavPrihlasky.Dokonceno && p.Osvedceni != null)
+                            {
+                                <a asp-page="/Osvedceni" asp-route-cislo="@p.Osvedceni.CisloOsvedceni" class="btn btn-sm btn-outline-success">
+                                    Certifikát
+                                </a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Storno přihlášky -->
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="Cancel">
+                <input type="hidden" asp-for="CancelData.PrihlaskaId" id="cancelPrihlaskaId" />
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold text-danger">Storno přihlášky studenta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        Opravdu chcete stornovat přihlášku studenta <strong id="cancelStudentName"></strong>?
+                    </p>
+                    <p class="text-muted small">
+                        <strong>Obchodní pravidlo klienta:</strong> Přihláška se fyzicky nemaže, zůstane archivována v databázi pro účely reklamací. Uvolněné místo bude automaticky nabídnuto prvnímu náhradníkovi v pořadníku (Rozhodnutí č. 2).
+                    </p>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Důvod zrušení (povinné):</label>
+                        <textarea asp-for="CancelData.Duvod" class="form-control" rows="3" placeholder="Uveďte důvod storna..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Zpět</button>
+                    <button type="submit" class="btn btn-danger">Potvrdit storno</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    function toggleNewStudentFields(show) {
+        document.getElementById('newStudentFields').style.display = show ? 'block' : 'none';
+        var select = document.getElementById('studentSelect');
+        if (show) {
+            select.value = '';
+            select.disabled = true;
+        } else {
+            select.disabled = false;
+        }
+    }
+
+    function toggleAdminNote(show) {
+        document.getElementById('adminNoteField').style.display = show ? 'block' : 'none';
+    }
+
+    function openCancelModal(id, name) {
+        document.getElementById('cancelPrihlaskaId').value = id;
+        document.getElementById('cancelStudentName').innerText = name;
+        new bootstrap.Modal(document.getElementById('cancelModal')).show();
+    }
+</script>
+}

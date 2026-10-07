@@ -1,0 +1,253 @@
+@page
+@model OsvedceniModel
+@{
+    ViewData["Title"] = "Osvědčení o absolvování";
+}
+
+<div class="no-print">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Vydávání a evidence osvědčení</h2>
+            <p class="text-muted mb-0">Dvoustupňové ověření (70% docházka + lektor), generování jedinečných čísel a auditní stopa</p>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.AlertSuccess))
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>✅ Úspěch:</strong> @Model.AlertSuccess
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.AlertError))
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>⚠️ Nelze vystavit:</strong> @Model.AlertError
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Vyhledávání osvědčení dle evidenčního čísla -->
+    <div class="content-card mb-4">
+        <form method="get" class="row align-items-center g-3">
+            <div class="col-md-5">
+                <label class="form-label fw-semibold mb-1">🔍 Ověřit osvědčení podle evidenčního čísla:</label>
+                <div class="input-group">
+                    <input type="text" name="Cislo" value="@Model.Cislo" class="form-control" placeholder="např. AT-2026-0001" />
+                    <button type="submit" class="btn btn-primary-custom">Vyhledat</button>
+                </div>
+            </div>
+            <div class="col-md-7 text-md-end pt-md-4">
+                <span class="text-muted small">Evidenční číslo je globálně jedinečné a již vydané osvědčení je neměnné.</span>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Zobrazení certifikátu k tisku -->
+@if (Model.VyhledaneOsvedceni != null)
+{
+    var cert = Model.VyhledaneOsvedceni;
+    <div class="no-print text-center mb-3">
+        <button onclick="window.print()" class="btn btn-success fw-bold px-4">
+            🖨️ Vytisknout osvědčení (A4)
+        </button>
+        <a asp-page="/Osvedceni" class="btn btn-outline-secondary ms-2">Zavřít náhled</a>
+    </div>
+
+    <div class="certificate-container">
+        <div class="certificate-header-sub">Česká republika • Akademie Trutnov</div>
+        <div class="certificate-title">Osvědčení o rekvalifikaci</div>
+        
+        <p class="mt-4 mb-1 text-muted" style="font-size: 1.1rem;">tímto potvrzuje, že absolvent</p>
+        <div class="certificate-recipient">
+            @(cert.Prihlaska?.Student?.CeleJmeno ?? "Jméno Absolventa")
+        </div>
+
+        <p class="text-muted mb-1" style="font-size: 1.1rem;">úspěšně dokončil akreditovaný vzdělávací program</p>
+        <div class="certificate-course">
+            @(cert.Prihlaska?.Termin?.Kurz?.Nazev ?? "Název vzdělávacího programu")
+        </div>
+
+        <p class="text-muted" style="max-width: 600px; margin: 1.5rem auto;">
+            v celkovém rozsahu <strong>@(cert.Prihlaska?.Termin?.Kurz?.RozsahHodin ?? 0) hodin</strong>,
+            který se konal v termínu od @(cert.Prihlaska?.Termin?.DatumOd.ToString("dd.MM.yyyy") ?? "") do @(cert.Prihlaska?.Termin?.DatumDo.ToString("dd.MM.yyyy") ?? "").
+        </p>
+
+        <div class="my-4">
+            <span class="badge bg-light text-dark border p-2 px-3 fw-bold" style="font-size: 1rem;">
+                Hodnocení zkušební komise: @cert.Vysledek (Docházka: @cert.DosazenaDochazkaProcent %)
+            </span>
+        </div>
+
+        <div class="row align-items-end mt-5 pt-4">
+            <div class="col-4 text-center">
+                <div class="certificate-seal">
+                    <span>Pečeť<br />Akademie</span>
+                </div>
+            </div>
+            <div class="col-4 text-center">
+                <p class="mb-1 text-muted small">Evidenční číslo osvědčení:</p>
+                <strong class="fs-5 text-primary">@cert.CisloOsvedceni</strong>
+                <p class="text-muted small mt-1">Datum vydání: @cert.DatumVydani.ToString("dd.MM.yyyy")</p>
+            </div>
+            <div class="col-4 text-center">
+                <div style="border-bottom: 1px solid #94a3b8; width: 180px; margin: 0 auto 0.5rem;"></div>
+                <p class="mb-0 fw-semibold">@cert.Vystavil</p>
+                <small class="text-muted">Ředitelka vzdělávacího centra</small>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="no-print mt-4">
+    <!-- Výběr termínu pro hodnocení a vystavení -->
+    <div class="content-card mb-4">
+        <form method="get" class="row align-items-center g-3">
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Zvolte termín kurzu pro vystavení osvědčení:</label>
+                <select asp-for="TerminId" class="form-select" onchange="this.form.submit()">
+                    @foreach (var t in Model.VsechnyTerminy)
+                    {
+                        <option value="@t.Id">
+                            @(t.Kurz?.Nazev ?? "Kurz") (@t.DatumOd.ToString("dd.MM.") – @t.DatumDo.ToString("dd.MM.yyyy")) - @t.Stav
+                        </option>
+                    }
+                </select>
+            </div>
+        </form>
+    </div>
+
+    <!-- Kandidáti na vystavení osvědčení -->
+    <div class="content-card mb-4">
+        <div class="content-card-header">
+            <h5 class="content-card-title">👨‍🎓 Studenti termínu k certifikaci (Dvoustupňové ověření - Rozhodnutí č. 1)</h5>
+        </div>
+        <p class="text-muted small">
+            Pro vystavení osvědčení musí student splnit technickou podmínku $\ge 70\ \%$ docházky a získat hodnocení lektora.
+        </p>
+
+        <div class="table-responsive">
+            <table class="table table-custom">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Docházka</th>
+                        <th>Technická podmínka</th>
+                        <th>Stav osvědčení</th>
+                        <th>Hodnocení lektora & Vystavení</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var k in Model.Kandidati)
+                    {
+                        <tr>
+                            <td>
+                                <strong>@k.StudentJmeno</strong><br />
+                                <small class="text-muted">@k.StudentEmail</small>
+                            </td>
+                            <td>
+                                <strong>@k.ProcentoDochazky %</strong>
+                            </td>
+                            <td>
+                                @if (k.SplnujeDochazku)
+                                {
+                                    <span class="badge bg-success">Splněno (≥ 70%)</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Nesplněno (&lt; 70%)</span>
+                                }
+                            </td>
+                            <td>
+                                @if (k.MaJizOsvedceni)
+                                {
+                                    <div>
+                                        <span class="badge badge-dokonceno">Vystaveno</span><br />
+                                        <small class="fw-bold text-primary">@k.CisloOsvedceni</small>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Nevystaveno</span>
+                                }
+                            </td>
+                            <td>
+                                @if (k.MaJizOsvedceni)
+                                {
+                                    <a asp-page="/Osvedceni" asp-route-cislo="@k.CisloOsvedceni" class="btn btn-sm btn-outline-primary">
+                                        👁️ Zobrazit / Tisk
+                                    </a>
+                                }
+                                else if (k.SplnujeDochazku)
+                                {
+                                    <form method="post" asp-page-handler="Issue" class="d-flex align-items-center gap-2">
+                                        <input type="hidden" name="prihlaskaId" value="@k.PrihlaskaId" />
+                                        <select name="vysledek" class="form-select form-select-sm" style="width: auto;">
+                                            <option value="Prospel">Prospěl</option>
+                                            <option value="ProspelSVyznamenanim">Prospěl s vyznamenáním</option>
+                                        </select>
+                                        <input type="hidden" name="vystavil" value="Ing. Lucie Bartošová" />
+                                        <button type="submit" class="btn btn-sm btn-primary-custom">
+                                            📜 Vystavit
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-sm btn-outline-secondary" disabled title="Nedostatečná docházka (< 70 %)">
+                                        Nelze vystavit (&lt;70%)
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Seznam již vydaných osvědčení termínu -->
+    @if (Model.VydanaOsvedceni.Any())
+    {
+        <div class="content-card">
+            <div class="content-card-header">
+                <h5 class="content-card-title">📜 Historický registr vydaných osvědčení termínu (Neměnný audit)</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th>Evidenční číslo</th>
+                            <th>Absolvent</th>
+                            <th>Datum vydání</th>
+                            <th>Výsledek hodnocení</th>
+                            <th>Docházka</th>
+                            <th>Vystavil</th>
+                            <th>Akce</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var o in Model.VydanaOsvedceni)
+                        {
+                            <tr>
+                                <td><strong class="text-primary">@o.CisloOsvedceni</strong></td>
+                                <td>@(o.Prihlaska?.Student?.CeleJmeno ?? "Student")</td>
+                                <td>@o.DatumVydani.ToString("dd.MM.yyyy")</td>
+                                <td><span class="badge bg-success">@o.Vysledek</span></td>
+                                <td>@o.DosazenaDochazkaProcent %</td>
+                                <td>@o.Vystavil</td>
+                                <td>
+                                    <a asp-page="/Osvedceni" asp-route-cislo="@o.CisloOsvedceni" class="btn btn-sm btn-outline-primary">
+                                        Náhled & Tisk
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>

@@ -1,0 +1,108 @@
+@page
+@model KurzyModel
+@{
+    ViewData["Title"] = "Katalog kurzů";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1">Katalog kurzů Akademie Trutnov</h2>
+        <p class="text-muted mb-0">Evidence rekvalifikačních i firemních programů s akreditací MŠMT</p>
+    </div>
+    <button class="btn btn-primary-custom" data-bs-toggle="modal" data-bs-target="#newCourseModal">
+        ➕ Založit nový kurz
+    </button>
+</div>
+
+<div class="content-card">
+    <div class="table-responsive">
+        <table class="table table-custom">
+            <thead>
+                <tr>
+                    <th>Název kurzu</th>
+                    <th>Anotace</th>
+                    <th>Hodinová dotace</th>
+                    <th>Cena za účastníka</th>
+                    <th>Akreditace</th>
+                    <th>Akce</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var k in Model.Kurzy)
+                {
+                    <tr>
+                        <td>
+                            <strong>@k.Nazev</strong>
+                        </td>
+                        <td style="max-width: 380px;">
+                            <small class="text-muted">@k.Anotace</small>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark border">@k.RozsahHodin hodin</span>
+                        </td>
+                        <td>
+                            <strong class="text-primary">@k.Cena.ToString("N0") Kč</strong>
+                        </td>
+                        <td>
+                            @if (k.Akreditovano)
+                            {
+                                <span class="badge bg-success">Akreditováno MŠMT</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Odborný kurz</span>
+                            }
+                        </td>
+                        <td>
+                            <a asp-page="/Terminy" class="btn btn-sm btn-outline-primary">Vypsané termíny</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Nový kurz -->
+<div class="modal fade" id="newCourseModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Založení nového kurzu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Název kurzu</label>
+                        <input asp-for="Input.Nazev" class="form-control" placeholder="např. Pokročilá datová analytika v Pythonu" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Anotace a popis</label>
+                        <textarea asp-for="Input.Anotace" class="form-control" rows="3" placeholder="Popis osnovy a cílů kurzu..." required></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Rozsah hodin</label>
+                            <input asp-for="Input.RozsahHodin" type="number" class="form-control" min="1" max="500" required />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Cena (Kč)</label>
+                            <input asp-for="Input.Cena" type="number" step="100" class="form-control" required />
+                        </div>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input asp-for="Input.Akreditovano" class="form-check-input" type="checkbox" id="akreditaceCheck" />
+                        <label class="form-check-label" for="akreditaceCheck">
+                            Kurz je akreditován MŠMT ČR
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Zrušit</button>
+                    <button type="submit" class="btn btn-primary-custom">Uložit kurz</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

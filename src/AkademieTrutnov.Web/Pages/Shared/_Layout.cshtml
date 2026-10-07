@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Akademie Trutnov</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header class="no-print">
+        <nav class="navbar navbar-expand-lg app-navbar">
+            <div class="container-fluid px-4">
+                <a class="app-brand" asp-area="" asp-page="/Index">
+                    <span>🎓 Akademie Trutnov</span>
+                    <span class="badge-tag">PPRO 2026/27</span>
+                </a>
+                <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#appNav" aria-controls="appNav"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="appNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-page="/Index">📊 Přehled</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-page="/Kurzy">📚 Kurzy</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-page="/Terminy">📅 Termíny & Učebny</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-page="/Prihlasky">👥 Přihlášky & Pořadník</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-page="/Dochazka">📋 Docházka</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-page="/Osvedceni">📜 Osvědčení</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-page="/Reporty">📈 Reporty</a>
+                        </li>
+                    </ul>
+                    <div class="d-flex align-items-center gap-2">
+                        <a href="/swagger" target="_blank" class="nav-link nav-api-btn">
+                            ⚡ Swagger API
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container-fluid px-4 py-4">
+        <main role="main">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="text-center py-3 text-muted border-top bg-white no-print mt-auto">
+        <div class="container">
+            <small>
+                <strong>Akademie Trutnov</strong> – Systém správy a evidence kurzů (Zadání C) | 
+                Semestrální projekt PPRO 2026/2027, FIM UHK |
+                Klient: Ing. Lucie Bartošová
+            </small>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

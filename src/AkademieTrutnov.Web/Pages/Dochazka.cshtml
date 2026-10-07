@@ -1,0 +1,177 @@
+@page
+@model DochazkaModel
+@{
+    ViewData["Title"] = "Evidence docházky";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1">Evidence docházky studentů</h2>
+        <p class="text-muted mb-0">Záznam přítomnosti na výukových dnech a kontrola 70% podmínky pro osvědčení</p>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.AlertMessage))
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>✅ Uloženo:</strong> @Model.AlertMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<!-- Výběr termínu -->
+<div class="content-card mb-4">
+    <form method="get" class="row align-items-center g-3">
+        <div class="col-md-6">
+            <label class="form-label fw-semibold">Zvolte termín kurzu:</label>
+            <select asp-for="TerminId" class="form-select" onchange="this.form.submit()">
+                @foreach (var t in Model.VsechnyTerminy)
+                {
+                    <option value="@t.Id">
+                        @(t.Kurz?.Nazev ?? "Kurz") | @t.DatumOd.ToString("dd.MM.yyyy") – @t.DatumDo.ToString("dd.MM.yyyy") (@t.Stav)
+                    </option>
+                }
+            </select>
+        </div>
+        <div class="col-md-6 text-md-end pt-md-4">
+            <span class="badge bg-info text-dark">Podmínka MŠMT: Minimálně 70 % docházky</span>
+        </div>
+    </form>
+</div>
+
+@if (Model.AktualniTermin != null)
+{
+    <div class="row">
+        <!-- Levý sloupec: Dny výuky & Záznam pro vybraný den -->
+        <div class="col-lg-7">
+            <div class="content-card mb-4">
+                <div class="content-card-header">
+                    <h5 class="content-card-title">📅 Výukové dny termínu</h5>
+                </div>
+
+                @if (Model.DnyVyuky.Any())
+                {
+                    <div class="d-flex flex-wrap gap-2 mb-4">
+                        @foreach (var den in Model.DnyVyuky)
+                        {
+                            bool isSelected = Model.VybranyDenId == den.Id;
+                            <a asp-page="/Dochazka" asp-route-terminId="@Model.TerminId" asp-route-vybranyDenId="@den.Id"
+                               class="btn btn-sm @(isSelected ? "btn-primary" : "btn-outline-secondary")">
+                                🗓️ @den.Datum.ToString("dd.MM.yyyy") (@den.PocetHodin h)
+                            </a>
+                        }
+                    </div>
+
+                    @if (Model.AktualniDen != null)
+                    {
+                        <div class="border rounded p-3 bg-light mb-3">
+                            <h6 class="fw-bold mb-1">
+                                Záznam docházky na den: @Model.AktualniDen.Datum.ToString("dd.MM.yyyy")
+                            </h6>
+                            <small class="text-muted d-block mb-3">
+                                Dotace dne: @Model.AktualniDen.PocetHodin hodin | Téma: @(Model.AktualniDen.Tema ?? "Běžná výuka")
+                            </small>
+
+                            <form method="post" asp-page-handler="SaveAttendance" asp-route-denVyukyId="@Model.AktualniDen.Id">
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-hover align-middle">
+                                        <thead>
+                                            <tr>
+                                                <th>Student</th>
+                                                <th style="width: 120px;" class="text-center">Přítomen</th>
+                                                <th>Poznámka</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var student in Model.ZapsaniStudenti)
+                                            {
+                                                bool isChecked = Model.PritomenMap.TryGetValue(student.Id, out var p) && p;
+                                                string poznamka = Model.PoznamkaMap.TryGetValue(student.Id, out var n) ? n : "";
+
+                                                <tr>
+                                                    <td>
+                                                        <strong>@student.CeleJmeno</strong>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <input type="hidden" name="PritomenMap[@student.Id]" value="false" />
+                                                        <input type="checkbox" name="PritomenMap[@student.Id]" value="true" class="form-check-input" @(isChecked ? "checked" : "") style="transform: scale(1.3);" />
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" name="PoznamkaMap[@student.Id]" value="@poznamka" class="form-control form-control-sm" placeholder="Omluvenka / poznámka..." />
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <button type="submit" class="btn btn-primary-custom mt-2">
+                                    💾 Uložit docházku dne
+                                </button>
+                            </form>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-muted">Pro tento termín zatím nebyly vygenerovány žádné výukové dny.</p>
+                }
+            </div>
+        </div>
+
+        <!-- Pravý sloupec: Celkový souhrn docházky a splnění 70 % -->
+        <div class="col-lg-5">
+            <div class="content-card">
+                <div class="content-card-header">
+                    <h5 class="content-card-title">📊 Celková docházka studentů</h5>
+                </div>
+                <p class="text-muted small">
+                    Výpočet celkové docházky. Pro vydání osvědčení je technickou podmínkou minimálně 70 % (Rozhodnutí č. 1).
+                </p>
+
+                <div class="table-responsive">
+                    <table class="table table-custom">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Hodin</th>
+                                <th>Účast</th>
+                                <th>Stav</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var s in Model.SouhrnDochazky)
+                            {
+                                <tr>
+                                    <td><strong>@s.CeleJmeno</strong></td>
+                                    <td>@s.OdchozenoHodin / @s.CelkemHodin h</td>
+                                    <td>
+                                        <strong>@s.ProcentoDochazky %</strong>
+                                        <div class="capacity-progress">
+                                            <div class="capacity-progress-bar @(s.SplnujePodminkuProAkreditaci ? "green" : "red")" style="width: @Math.Min(100, s.ProcentoDochazky)%"></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @if (s.SplnujePodminkuProAkreditaci)
+                                        {
+                                            <span class="badge bg-success">Splněno (≥70%)</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">Nesplněno (&lt;70%)</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-3 text-end">
+                    <a asp-page="/Osvedceni" asp-route-terminId="@Model.TerminId" class="btn btn-outline-primary btn-sm">
+                        📜 Přejít na vystavení osvědčení &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+}

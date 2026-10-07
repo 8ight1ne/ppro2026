@@ -1,0 +1,388 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+    --primary-light: #eff6ff;
+    --secondary: #64748b;
+    --success: #10b981;
+    --success-light: #ecfdf5;
+    --warning: #f59e0b;
+    --warning-light: #fffbeb;
+    --danger: #ef4444;
+    --danger-light: #fef2f2;
+    --surface: #ffffff;
+    --background: #f8fafc;
+    --card-border: #e2e8f0;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--background);
+    color: var(--text-main);
+    line-height: 1.6;
+    margin: 0;
+    padding-bottom: 70px;
+}
+
+/* Navigace */
+.app-navbar {
+    background: #0f172a;
+    border-bottom: 1px solid #1e293b;
+    padding: 0.75rem 0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.app-brand {
+    font-weight: 800;
+    font-size: 1.25rem;
+    color: #ffffff !important;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    letter-spacing: -0.02em;
+}
+
+.app-brand .badge-tag {
+    background: linear-gradient(135deg, #38bdf8, #2563eb);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.nav-link {
+    font-weight: 500;
+    color: #94a3b8 !important;
+    padding: 0.5rem 0.85rem !important;
+    border-radius: var(--radius-sm);
+    transition: all 0.2s ease;
+    font-size: 0.92rem;
+}
+
+.nav-link:hover, .nav-link.active {
+    color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.nav-api-btn {
+    background: rgba(56, 189, 248, 0.15);
+    color: #38bdf8 !important;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    font-weight: 600;
+}
+.nav-api-btn:hover {
+    background: rgba(56, 189, 248, 0.25) !important;
+}
+
+/* KPI Karty */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-md);
+    padding: 1.25rem 1.5rem;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+}
+
+.kpi-card.blue::before { background: var(--primary); }
+.kpi-card.green::before { background: var(--success); }
+.kpi-card.amber::before { background: var(--warning); }
+.kpi-card.purple::before { background: #8b5cf6; }
+
+.kpi-title {
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
+}
+
+.kpi-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text-main);
+    line-height: 1;
+}
+
+.kpi-desc {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-top: 0.4rem;
+}
+
+/* Karty sekcí */
+.content-card {
+    background: var(--surface);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    padding: 1.5rem;
+    margin-bottom: 1.75rem;
+}
+
+.content-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--card-border);
+    margin-bottom: 1.25rem;
+}
+
+.content-card-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Tabulky */
+.table-custom {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.table-custom th {
+    background: #f1f5f9;
+    color: #475569;
+    font-weight: 600;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-top: none;
+    padding: 0.75rem 1rem;
+}
+
+.table-custom td {
+    padding: 0.9rem 1rem;
+    vertical-align: middle;
+    border-color: #f1f5f9;
+    font-size: 0.92rem;
+}
+
+.table-custom tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+/* Badges */
+.badge-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.28rem 0.65rem;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+.badge-prihlasen {
+    background: #dcfce7;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+}
+
+.badge-poradnik {
+    background: #fef3c7;
+    color: #b45309;
+    border: 1px solid #fde68a;
+}
+
+.badge-nabidnuto {
+    background: #ffedd5;
+    color: #c2410c;
+    border: 1px solid #fed7aa;
+    animation: pulse 2s infinite;
+}
+
+.badge-dokonceno {
+    background: #ede9fe;
+    color: #6d28d9;
+    border: 1px solid #ddd6fe;
+}
+
+.badge-zruseno {
+    background: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+.badge-expirovano {
+    background: #f1f5f9;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.75; }
+}
+
+/* Progress bar kapacity */
+.capacity-progress {
+    height: 8px;
+    background: #e2e8f0;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 0.25rem;
+}
+
+.capacity-progress-bar {
+    height: 100%;
+    transition: width 0.4s ease;
+}
+
+.capacity-progress-bar.green { background: #10b981; }
+.capacity-progress-bar.amber { background: #f59e0b; }
+.capacity-progress-bar.red { background: #ef4444; }
+
+/* Tlačítka */
+.btn-primary-custom {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-sm);
+    transition: background 0.2s;
+}
+.btn-primary-custom:hover {
+    background-color: var(--primary-hover);
+    color: white;
+}
+
+.btn-sm-custom {
+    padding: 0.25rem 0.65rem;
+    font-size: 0.8rem;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+}
+
+/* Osvědčení certifikát design */
+.certificate-container {
+    background: white;
+    border: 10px double #1e3a8a;
+    padding: 3.5rem;
+    max-width: 840px;
+    margin: 2rem auto;
+    position: relative;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    color: #0f172a;
+    text-align: center;
+}
+
+.certificate-header-sub {
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.2em;
+    color: #64748b;
+    margin-bottom: 0.5rem;
+}
+
+.certificate-title {
+    font-size: 2.6rem;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    color: #1e3a8a;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    border-bottom: 2px solid #cbd5e1;
+    display: inline-block;
+    padding-bottom: 0.5rem;
+}
+
+.certificate-recipient {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 1.5rem 0 0.5rem;
+    text-decoration: underline;
+    text-decoration-color: #3b82f6;
+    text-underline-offset: 6px;
+}
+
+.certificate-course {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e40af;
+    margin: 1rem 0;
+}
+
+.certificate-seal {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fde047 0%, #ca8a04 100%);
+    border: 3px dashed #854d0e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    color: #713f12;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    box-shadow: 0 4px 10px rgba(202, 138, 4, 0.4);
+    margin: 0 auto;
+}
+
+/* Tiskové styly */
+@media print {
+    body {
+        background: white !important;
+        padding: 0 !important;
+    }
+    .app-navbar, .no-print, footer, .btn {
+        display: none !important;
+    }
+    .certificate-container {
+        border: 12px double #000 !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        page-break-inside: avoid;
+    }
+}

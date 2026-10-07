@@ -1,0 +1,156 @@
+@page
+@model TerminyModel
+@{
+    ViewData["Title"] = "Termíny kurzů";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1">Termíny kurzů & učebny</h2>
+        <p class="text-muted mb-0">Harmonogram výukových běhů s přiřazením učeben a lektorů</p>
+    </div>
+    <button class="btn btn-primary-custom" data-bs-toggle="modal" data-bs-target="#newTerminModal">
+        ➕ Vypsat nový termín
+    </button>
+</div>
+
+<div class="content-card">
+    <div class="table-responsive">
+        <table class="table table-custom">
+            <thead>
+                <tr>
+                    <th>Kurz</th>
+                    <th>Termín (Od – Do)</th>
+                    <th>Místo / Učebna</th>
+                    <th>Kapacita</th>
+                    <th>Vyučující lektoři</th>
+                    <th>Stav</th>
+                    <th>Akce</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var t in Model.Terminy)
+                {
+                    <tr>
+                        <td>
+                            <strong>@(t.Kurz?.Nazev ?? "Kurz")</strong>
+                        </td>
+                        <td>
+                            <span class="fw-semibold">@t.DatumOd.ToString("dd.MM.yyyy") – @t.DatumDo.ToString("dd.MM.yyyy")</span>
+                        </td>
+                        <td>
+                            <strong>@(t.Ucebna?.Nazev ?? "Učebna")</strong><br />
+                            <small class="text-muted">📍 @(t.Ucebna?.Adresa ?? "")</small>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark border">
+                                @t.Kapacita míst (dle učebny)
+                            </span>
+                        </td>
+                        <td>
+                            @if (t.TerminLektori.Any())
+                            {
+                                @foreach (var tl in t.TerminLektori)
+                                {
+                                    <div>
+                                        <small>👨‍🏫 @(tl.Lektor?.CeleJmeno ?? "Lektor") (@tl.PocetHodin h)</small>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted small">Zatím nepřiřazen</span>
+                            }
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark border">@t.Stav</span>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <a asp-page="/Prihlasky" asp-route-terminId="@t.Id" class="btn btn-sm btn-outline-primary">Přihlášky</a>
+                                <a asp-page="/Dochazka" asp-route-terminId="@t.Id" class="btn btn-sm btn-outline-secondary">Docházka</a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Nový termín -->
+<div class="modal fade" id="newTerminModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Vypsání nového termínu kurzu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Výběr kurzu</label>
+                        <select asp-for="Input.KurzId" class="form-select" required>
+                            <option value="">-- Vyberte kurz --</option>
+                            @foreach (var k in Model.Kurzy)
+                            {
+                                <option value="@k.Id">@k.Nazev (@k.RozsahHodin h, @k.Cena.ToString("N0") Kč)</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Učebna (Kapacita kurzu se striktně odvíjí od učebny)</label>
+                        <select asp-for="Input.UcebnaId" class="form-select" required>
+                            <option value="">-- Vyberte učebnu --</option>
+                            @foreach (var u in Model.Ucebny)
+                            {
+                                <option value="@u.Id">@u.Nazev (Kapacita: @u.Kapacita míst) - @u.Adresa</option>
+                            }
+                        </select>
+                        <div class="form-text text-muted">
+                            Obchodní pravidlo klienta: Kapacitu termínu nelze ručně navyšovat nad kapacitu učebny.
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Datum zahájení</label>
+                            <input asp-for="Input.DatumOd" type="date" class="form-control" required />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Datum ukončení</label>
+                            <input asp-for="Input.DatumDo" type="date" class="form-control" required />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Přiřazení lektorů (lze vybrat více - Rozhodnutí č. 5)</label>
+                        <div class="row">
+                            @foreach (var l in Model.Lektori)
+                            {
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="Input.LektorIds" value="@l.Id" id="lektor_@l.Id" />
+                                        <label class="form-check-label" for="lektor_@l.Id">
+                                            @l.CeleJmeno <small class="text-muted">(@(l.Externista ? "externista" : "interní"))</small>
+                                        </label>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Plánovaný počet hodin výuky na lektora</label>
+                        <input asp-for="Input.OduceneHodinyNaLektora" type="number" class="form-control" min="1" max="200" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Zrušit</button>
+                    <button type="submit" class="btn btn-primary-custom">Vytvořit termín</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
