@@ -200,3 +200,8 @@ public class DochazkaRepository : EfRepository<Dochazka>, IDochazkaRepository
             .ToListAsync(ct);
     }
 }
+
+public class UcebnaRepository : EfRepository<Ucebna>, IUcebnaRepository
+{
+    public UcebnaRepository(AppDbContext context) : base(context) { }
+}

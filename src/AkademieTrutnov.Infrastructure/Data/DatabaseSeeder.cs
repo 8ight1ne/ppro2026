@@ -135,7 +135,7 @@ public static class DatabaseSeeder
         // Termín 1: C# - plně obsazen (kapacita 5), probíhá, s náhradníky v pořadníku
         var terminCsharp = new Termin
         {
-            Id = Guid.Parse("t1111111-1111-1111-1111-111111111111"),
+            Id = Guid.Parse("ba111111-1111-1111-1111-111111111111"),
             KurzId = kurzCsharp.Id,
             UcebnaId = ucebnaLab.Id,
             DatumOd = DateTime.UtcNow.AddDays(-10),
@@ -147,7 +147,7 @@ public static class DatabaseSeeder
         // Termín 2: Účetnictví - plánovaný
         var terminUcetnictvi = new Termin
         {
-            Id = Guid.Parse("t2222222-2222-2222-2222-222222222222"),
+            Id = Guid.Parse("ba222222-2222-2222-2222-222222222222"),
             KurzId = kurzUcetnictvi.Id,
             UcebnaId = ucebnaSal.Id,
             DatumOd = DateTime.UtcNow.AddDays(14),
@@ -159,7 +159,7 @@ public static class DatabaseSeeder
         // Termín 3: Marketing - již ukončený, s vystavenými osvědčeními
         var terminMarketing = new Termin
         {
-            Id = Guid.Parse("t3333333-3333-3333-3333-333333333333"),
+            Id = Guid.Parse("ba333333-3333-3333-3333-333333333333"),
             KurzId = kurzMarketing.Id,
             UcebnaId = ucebnaSem.Id,
             DatumOd = DateTime.UtcNow.AddDays(-60),
@@ -171,7 +171,7 @@ public static class DatabaseSeeder
         // Termín 4: Manažerské dovednosti - plánovaný
         var terminManazer = new Termin
         {
-            Id = Guid.Parse("t4444444-4444-4444-4444-444444444444"),
+            Id = Guid.Parse("ba444444-4444-4444-4444-444444444444"),
             KurzId = kurzManazer.Id,
             UcebnaId = ucebnaSem.Id,
             DatumOd = DateTime.UtcNow.AddDays(30),
@@ -223,14 +223,14 @@ public static class DatabaseSeeder
         await context.TerminLektori.AddRangeAsync(tl1, tl2, tl3, tl4, tl5);
 
         // 6. Studenti
-        var s1 = new Student { Id = Guid.Parse("s1111111-1111-1111-1111-111111111111"), Jmeno = "Jan", Prijmeni = "Novák", Email = "jan.novak@example.cz", Telefon = "+420 601 111 222", Organizace = "Auto Kelly Trutnov" };
-        var s2 = new Student { Id = Guid.Parse("s2222222-2222-2222-2222-222222222222"), Jmeno = "Marie", Prijmeni = "Svobodová", Email = "marie.svobodova@example.cz", Telefon = "+420 602 222 333", Organizace = null };
-        var s3 = new Student { Id = Guid.Parse("s3333333-3333-3333-3333-333333333333"), Jmeno = "Petr", Prijmeni = "Černý", Email = "petr.cerny@example.cz", Telefon = "+420 603 333 444", Organizace = "Siemens Trutnov" };
-        var s4 = new Student { Id = Guid.Parse("s4444444-4444-4444-4444-444444444444"), Jmeno = "Lucie", Prijmeni = "Kučerová", Email = "lucie.kucerova@example.cz", Telefon = "+420 604 444 555", Organizace = null };
-        var s5 = new Student { Id = Guid.Parse("s5555555-5555-5555-5555-555555555555"), Jmeno = "David", Prijmeni = "Pospíšil", Email = "david.pospisil@example.cz", Telefon = "+420 605 555 666", Organizace = "Continental" };
-        var s6 = new Student { Id = Guid.Parse("s6666666-6666-6666-6666-666666666666"), Jmeno = "Alena", Prijmeni = "Veselá", Email = "alena.vesela@example.cz", Telefon = "+420 606 666 777", Organizace = null };
-        var s7 = new Student { Id = Guid.Parse("s7777777-7777-7777-7777-777777777777"), Jmeno = "Michal", Prijmeni = "Mareš", Email = "michal.mares@example.cz", Telefon = "+420 607 777 888", Organizace = null };
-        var s8 = new Student { Id = Guid.Parse("s8888888-8888-8888-8888-888888888888"), Jmeno = "Veronika", Prijmeni = "Němcová", Email = "veronika.nemcova@example.cz", Telefon = "+420 608 888 999", Organizace = "Krkonošské papírny" };
+        var s1 = new Student { Id = Guid.Parse("ca111111-1111-1111-1111-111111111111"), Jmeno = "Jan", Prijmeni = "Novák", Email = "jan.novak@example.cz", Telefon = "+420 601 111 222", Organizace = "Auto Kelly Trutnov" };
+        var s2 = new Student { Id = Guid.Parse("ca222222-2222-2222-2222-222222222222"), Jmeno = "Marie", Prijmeni = "Svobodová", Email = "marie.svobodova@example.cz", Telefon = "+420 602 222 333", Organizace = null };
+        var s3 = new Student { Id = Guid.Parse("ca333333-3333-3333-3333-333333333333"), Jmeno = "Petr", Prijmeni = "Černý", Email = "petr.cerny@example.cz", Telefon = "+420 603 333 444", Organizace = "Siemens Trutnov" };
+        var s4 = new Student { Id = Guid.Parse("ca444444-4444-4444-4444-444444444444"), Jmeno = "Lucie", Prijmeni = "Kučerová", Email = "lucie.kucerova@example.cz", Telefon = "+420 604 444 555", Organizace = null };
+        var s5 = new Student { Id = Guid.Parse("ca555555-5555-5555-5555-555555555555"), Jmeno = "David", Prijmeni = "Pospíšil", Email = "david.pospisil@example.cz", Telefon = "+420 605 555 666", Organizace = "Continental" };
+        var s6 = new Student { Id = Guid.Parse("ca666666-6666-6666-6666-666666666666"), Jmeno = "Alena", Prijmeni = "Veselá", Email = "alena.vesela@example.cz", Telefon = "+420 606 666 777", Organizace = null };
+        var s7 = new Student { Id = Guid.Parse("ca777777-7777-7777-7777-777777777777"), Jmeno = "Michal", Prijmeni = "Mareš", Email = "michal.mares@example.cz", Telefon = "+420 607 777 888", Organizace = null };
+        var s8 = new Student { Id = Guid.Parse("ca888888-8888-8888-8888-888888888888"), Jmeno = "Veronika", Prijmeni = "Němcová", Email = "veronika.nemcova@example.cz", Telefon = "+420 608 888 999", Organizace = "Krkonošské papírny" };
 
         await context.Studenti.AddRangeAsync(s1, s2, s3, s4, s5, s6, s7, s8);
 

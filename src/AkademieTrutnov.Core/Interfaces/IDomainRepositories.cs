@@ -46,3 +46,7 @@ public interface IDochazkaRepository : IRepository<Dochazka>
     Task<DenVyuky?> GetDenVyukyWithAttendanceAsync(Guid denVyukyId, CancellationToken ct = default);
     Task<List<DenVyuky>> GetDnyVyukyForTerminWithAttendanceAsync(Guid terminId, CancellationToken ct = default);
 }
+
+public interface IUcebnaRepository : IRepository<Ucebna>
+{
+}

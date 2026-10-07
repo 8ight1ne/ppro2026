@@ -26,6 +26,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // 2. Registrace repozitářů a UnitOfWork (Infrastrukturní vrstva)
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
+builder.Services.AddScoped<IUcebnaRepository, UcebnaRepository>();
 builder.Services.AddScoped<ITerminRepository, TerminRepository>();
 builder.Services.AddScoped<IPrihlaskaRepository, PrihlaskaRepository>();
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
