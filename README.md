@@ -245,4 +245,5 @@ dotnet test
 | 2026-09-30 | Inicializace repozitáře, nastavení pravidel asistenta v `AGENTS.md`, vytvoření technické dokumentace a oddílu Rozhodnutí v `README.md`. | Vývojový tým |
 | 2026-10-07 | Kompletní implementace 3-vrstvé architektury v .NET 8 (Core, Infrastructure, Web, Tests), zprovoznění pořadníku náhradníků s 24h nabídkami, dvoustupňové certifikace (70% docházka + lektor), EF Core migrací, Docker Compose, Swagger API a automatizovaných xUnit testů. | Vývojový tým |
 | 2026-11-09 | Úprava uživatelského rozhraní: odstranění emoji ikon ze všech tlačítek napříč Razor Pages pro čistší a formálnější vzhled. | Vývojový tým |
+| 2026-11-09 | Úprava navigace: tlačítko pro přístup k Swagger REST API v horní navigační liště se zobrazuje výhradně v režimu Debug / Development. | Vývojový tým |
 

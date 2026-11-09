@@ -1,3 +1,4 @@
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment WebHostEnvironment
 <!DOCTYPE html>
 <html lang="cs">
 <head>
@@ -43,11 +44,21 @@
                             <a class="nav-link" asp-page="/Reporty">📈 Reporty</a>
                         </li>
                     </ul>
-                    <div class="d-flex align-items-center gap-2">
-                        <a href="/swagger" target="_blank" class="nav-link nav-api-btn">
-                            Swagger API
-                        </a>
-                    </div>
+                    @{
+                        bool isDebug = WebHostEnvironment.IsDevelopment() || 
+                                       string.Equals(WebHostEnvironment.EnvironmentName, "Debug", StringComparison.OrdinalIgnoreCase);
+#if DEBUG
+                        isDebug = true;
+#endif
+                    }
+                    @if (isDebug)
+                    {
+                        <div class="d-flex align-items-center gap-2">
+                            <a href="/swagger" target="_blank" class="nav-link nav-api-btn">
+                                Swagger API
+                            </a>
+                        </div>
+                    }
                 </div>
             </div>
         </nav>
