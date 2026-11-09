@@ -11,10 +11,10 @@
     </div>
     <div class="d-flex gap-2">
         <a asp-page="/Prihlasky" class="btn btn-primary-custom">
-            ➕ Zapsat studenta
+            Zapsat studenta
         </a>
         <a asp-page="/Terminy" class="btn btn-outline-secondary">
-            📅 Vypsat termín
+            Vypsat termín
         </a>
     </div>
 </div>
@@ -91,11 +91,11 @@
                                 <div class="d-flex gap-2">
                                     <form method="post" asp-page-handler="AcceptOffer" class="d-inline">
                                         <input type="hidden" name="prihlaskaId" value="@n.Id" />
-                                        <button type="submit" class="btn btn-sm btn-success">✅ Potvrdit účast</button>
+                                        <button type="submit" class="btn btn-sm btn-success">Potvrdit účast</button>
                                     </form>
                                     <form method="post" asp-page-handler="DeclineOffer" class="d-inline">
                                         <input type="hidden" name="prihlaskaId" value="@n.Id" />
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">❌ Odmítnout</button>
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Odmítnout</button>
                                     </form>
                                 </div>
                             </td>

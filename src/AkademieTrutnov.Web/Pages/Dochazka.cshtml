@@ -57,7 +57,7 @@
                             bool isSelected = Model.VybranyDenId == den.Id;
                             <a asp-page="/Dochazka" asp-route-terminId="@Model.TerminId" asp-route-vybranyDenId="@den.Id"
                                class="btn btn-sm @(isSelected ? "btn-primary" : "btn-outline-secondary")">
-                                🗓️ @den.Datum.ToString("dd.MM.yyyy") (@den.PocetHodin h)
+                                @den.Datum.ToString("dd.MM.yyyy") (@den.PocetHodin h)
                             </a>
                         }
                     </div>
@@ -105,7 +105,7 @@
                                     </table>
                                 </div>
                                 <button type="submit" class="btn btn-primary-custom mt-2">
-                                    💾 Uložit docházku dne
+                                    Uložit docházku dne
                                 </button>
                             </form>
                         </div>
@@ -168,7 +168,7 @@
 
                 <div class="mt-3 text-end">
                     <a asp-page="/Osvedceni" asp-route-terminId="@Model.TerminId" class="btn btn-outline-primary btn-sm">
-                        📜 Přejít na vystavení osvědčení &rarr;
+                        Přejít na vystavení osvědčení &rarr;
                     </a>
                 </div>
             </div>

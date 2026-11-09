@@ -51,7 +51,7 @@
     var cert = Model.VyhledaneOsvedceni;
     <div class="no-print text-center mb-3">
         <button onclick="window.print()" class="btn btn-success fw-bold px-4">
-            🖨️ Vytisknout osvědčení (A4)
+            Vytisknout osvědčení (A4)
         </button>
         <a asp-page="/Osvedceni" class="btn btn-outline-secondary ms-2">Zavřít náhled</a>
     </div>
@@ -177,7 +177,7 @@
                                 @if (k.MaJizOsvedceni)
                                 {
                                     <a asp-page="/Osvedceni" asp-route-cislo="@k.CisloOsvedceni" class="btn btn-sm btn-outline-primary">
-                                        👁️ Zobrazit / Tisk
+                                        Zobrazit / Tisk
                                     </a>
                                 }
                                 else if (k.SplnujeDochazku)
@@ -190,7 +190,7 @@
                                         </select>
                                         <input type="hidden" name="vystavil" value="Ing. Lucie Bartošová" />
                                         <button type="submit" class="btn btn-sm btn-primary-custom">
-                                            📜 Vystavit
+                                            Vystavit
                                         </button>
                                     </form>
                                 }
