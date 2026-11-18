@@ -247,4 +247,5 @@ dotnet test
 | 2026-11-09 | Úprava uživatelského rozhraní: odstranění emoji ikon ze všech tlačítek napříč Razor Pages pro čistší a formálnější vzhled. | Vývojový tým |
 | 2026-11-09 | Úprava navigace: tlačítko pro přístup k Swagger REST API v horní navigační liště se zobrazuje výhradně v režimu Debug / Development. | Vývojový tým |
 | 2026-11-18 | Úprava uživatelského rozhraní: odstranění emoji ikon z horní navigační lišty (`_Layout.cshtml`). | Vývojový tým |
+| 2026-11-18 | Oprava zobrazení tlačítka Swagger API: podmínka v `_Layout.cshtml` zúžena výhradně na direktivu `#if DEBUG`, aby se tlačítko skrylo i v Release konfiguraci spuštěné z Visual Studia. | Vývojový tým |
 
